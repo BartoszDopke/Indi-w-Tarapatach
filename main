@@ -4,8 +4,6 @@
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_ttf.h>
 
-
-
 const int SCREEN_W = 1280;
 const int SCREEN_H = 720;
 
@@ -72,3 +70,4 @@ int main(int argc, char **argv)
 	al_destroy_event_queue(event_queue);
 	return 0;
 }
+
