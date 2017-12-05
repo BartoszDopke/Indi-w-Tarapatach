@@ -24,6 +24,7 @@ int main(int argc, char **argv)
 	}
 	al_init_font_addon(); // initialize the font addon
 	al_init_ttf_addon();// initialize the ttf (True Type Font) addon
+	al_install_keyboard(); //installing keyboard
 
 	displaystart = al_create_display(1024, 768);
 	if (!displaystart) {
@@ -48,6 +49,7 @@ int main(int argc, char **argv)
 	return -1;
 	}
 	al_register_event_source(event_queue, al_get_display_event_source(displaystart));
+	al_register_event_source(event_queue, al_get_keyboard_event_source());
 	al_clear_to_color(al_map_rgb(2, 147, 0));
 	al_draw_text(fonttytul, al_map_rgb(223, 234, 18), 1024 / 2, 80, ALLEGRO_ALIGN_CENTRE, "Indi w tarapatach!");
 	al_draw_text(font, al_map_rgb(255, 255, 255), 1024 / 2, 250, ALLEGRO_ALIGN_CENTRE, "Nowa gra");
@@ -64,12 +66,9 @@ int main(int argc, char **argv)
 	if (get_event && ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
 	break;
 	}
-
-	al_clear_to_color(al_map_rgb(2, 147, 0));
-	al_draw_text(fonttytul, al_map_rgb(223, 234, 18), 1024 / 2, 80, ALLEGRO_ALIGN_CENTRE, "Indi w tarapatach!");
-	al_draw_text(font, al_map_rgb(255, 255, 255), 1024 / 2, 250, ALLEGRO_ALIGN_CENTRE, "Nowa gra");
-	al_draw_text(font, al_map_rgb(255, 255, 255), 1024 / 2, 400, ALLEGRO_ALIGN_CENTRE, "Wyjdz z gry");
-	al_flip_display();
+	else if (get_event && ev.type == ALLEGRO_EVENT_KEY_DOWN) {
+		break;
+	}
 	}
 
 	al_destroy_display(displaystart);
