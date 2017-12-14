@@ -99,6 +99,9 @@ int main(int argc, char **argv)
 		else if (al_key_down(&keyState, ALLEGRO_KEY_2)) {
 			break;
 		}
+		else if (al_key_down(&keyState, ALLEGRO_KEY_ESCAPE)) {
+			break;
+		}
 		else if (al_key_down(&keyState, ALLEGRO_KEY_1)) {
 			background = al_load_bitmap("mapa4.png");
 			if (!background)
