@@ -3,6 +3,7 @@
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_ttf.h>
+#include <allegro5/allegro_primitives.h>
 
 
 const float FPS = 60;
@@ -32,6 +33,7 @@ int main(int argc, char **argv)
 	}
 	al_init_font_addon(); // initialize the font addon
 	al_init_ttf_addon();// initialize the ttf (True Type Font) addon
+	al_init_primitives_addon();
 	al_install_keyboard(); //installing keyboard
 	timer = al_create_timer(0.8 / FPS);
 	if (!timer) {
@@ -210,24 +212,31 @@ int main(int argc, char **argv)
 						break;
 					}
 				}
-			/*	if (warrior_x == 1100) {
-					background = al_load_bitmap("mapa5.png");
-					al_draw_bitmap(background, 0, 0, 0);
-					al_set_target_bitmap(warrior);
-					al_set_target_bitmap(exit);
-					al_set_target_bitmap(al_get_backbuffer(display));
+				/*	if (warrior_x == 1100) {
+				background = al_load_bitmap("mapa5.png");
+				al_draw_bitmap(background, 0, 0, 0);
+				al_set_target_bitmap(warrior);
+				al_set_target_bitmap(exit);
+				al_set_target_bitmap(al_get_backbuffer(display));
 				}
 				else if (warrior_y == 40) {
-					background = al_load_bitmap("mapa5.png");
-					al_draw_bitmap(background, 0, 0, 0);
-					al_set_target_bitmap(warrior);
-					al_set_target_bitmap(exit);
-					al_set_target_bitmap(al_get_backbuffer(display));
-				} */ //													 EKSPERYMENT!
+				background = al_load_bitmap("mapa5.png");
+				al_draw_bitmap(background, 0, 0, 0);
+				al_set_target_bitmap(warrior);
+				al_set_target_bitmap(exit);
+				al_set_target_bitmap(al_get_backbuffer(display));
+				} */ //	EKSPERYMENT!
+				
 				if (redraw && al_is_event_queue_empty(event_queue)) {
 					redraw = false;
 
-					
+					al_draw_filled_rectangle(500, 400, 550, 450, al_map_rgb(160, 82, 45)); //małpa
+					al_draw_filled_rectangle(650, 150, 700, 200, al_map_rgb(160, 82, 45));
+					al_draw_filled_rectangle(950, 150, 1000, 200, al_map_rgb(160, 82, 45));
+					al_draw_filled_rectangle(350, 600, 400, 650, al_map_rgb(160, 82, 45));
+					al_draw_filled_rectangle(100, 400, 150, 450, al_map_rgb(218, 165, 32)); //tygrys
+					al_draw_filled_rectangle(100, 100, 150, 150, al_map_rgb(218, 165, 32));
+					al_draw_filled_rectangle(800, 250, 850, 300, al_map_rgb(218, 165, 32));
 					al_draw_bitmap(exit, 1100, 40, 0);
 					al_draw_bitmap(warrior, warrior_x, warrior_y, 0);
 					al_flip_display();
