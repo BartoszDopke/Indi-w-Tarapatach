@@ -41,7 +41,7 @@ void enemy_placement(int level)
 
 	if (level == 1 || level == 2 || level == 3 || level == 4 || level == 5)
 	{
-		ile_przeciwnikow = 4;
+		ile_przeciwnikow = 10;
 		for (i = 0; i < ile_przeciwnikow; i++)
 		{
 			przeciwnicy[i][0] = rand() % 2;
@@ -52,13 +52,29 @@ void enemy_placement(int level)
 	}
 }
 
+void enemy_movement()
+{
+	int i;
+	for(i = 0; i<ile_przeciwnikow; i++)
+		if (przeciwnicy[i][0] == 0) 
+		{
+			przeciwnicy[i][1] -= 6.0;
+			if (przeciwnicy[i][1] <= 0) przeciwnicy[i][0] = 1;
+		}
+		else 
+		{
+			przeciwnicy[i][1] += 6.0;
+			if (przeciwnicy[i][1] + 50 >= SCREEN_W ) przeciwnicy[i][0] = 0;
+		}
+		
+
+}
+
 
 int main(int argc, char **argv)
 {
 	ALLEGRO_DISPLAY *display = NULL;
 	ALLEGRO_EVENT_QUEUE *event_queue = NULL;
-	ALLEGRO_COLOR monkey = al_map_rgb(160, 82, 45);
-	ALLEGRO_COLOR tiger = al_map_rgb(218, 165, 32);
 	ALLEGRO_KEYBOARD_STATE keyState;
 	ALLEGRO_TIMER *timer = NULL;
 	float warrior_x = 30;
@@ -70,6 +86,7 @@ int main(int argc, char **argv)
 	bool key[4] = { false, false, false, false };
 	bool redraw = true;
 	bool doexit = false;
+	int kolizja = 0;
 
 
 	if (!al_init()) {
@@ -257,20 +274,7 @@ int main(int argc, char **argv)
 						break;
 					}
 				}
-				/*	if (warrior_x == 1100) {
-				background = al_load_bitmap("mapa5.png");
-				al_draw_bitmap(background, 0, 0, 0);
-				al_set_target_bitmap(warrior);
-				al_set_target_bitmap(exit);
-				al_set_target_bitmap(al_get_backbuffer(display));
-				} */
-				/*if (warrior_y == 40) {
-				background = al_load_bitmap("mapa5.png");
-				al_draw_bitmap(background, 0, 0, 0);
-				al_set_target_bitmap(warrior);
-				al_set_target_bitmap(exit);
-				al_set_target_bitmap(al_get_backbuffer(display));
-				}  */ //	EKSPERYMENT!
+				
 				if (next_level == 1)
 				{
 					warrior_x = 30;
@@ -307,7 +311,7 @@ int main(int argc, char **argv)
 					new_enemy = 1;
 					enemy_placement(background_img);
 				}
-				//ruch przeciwnikow tutaj
+				enemy_movement();
 				next_level = Collision(warrior_x + 5, warrior_y, 60, 98, 1160, 40, 50, 85);
 				if (redraw && al_is_event_queue_empty(event_queue)) 
 				{
@@ -317,7 +321,19 @@ int main(int argc, char **argv)
 						printf("%i :: x: %.2f :: y: %.2f\n", i,przeciwnicy[i][1], przeciwnicy[i][2]);
 						if (przeciwnicy[i][3] == 0) al_draw_filled_rectangle(przeciwnicy[i][1],przeciwnicy[i][2], przeciwnicy[i][1]+50, przeciwnicy[i][2]+50, al_map_rgb(160, 82, 45));
 						else al_draw_filled_rectangle(przeciwnicy[i][1], przeciwnicy[i][2], przeciwnicy[i][1] + 50, przeciwnicy[i][2] + 50, al_map_rgb(218, 165, 32));
-					}					
+						if (kolizja != 1)
+						{
+							kolizja = Collision(warrior_x-6, warrior_y, 60, 98, przeciwnicy[i][1], przeciwnicy[i][2], 50, 50);
+						}
+					}
+					if (kolizja == 1)
+					{
+						warrior_x = 30;
+						warrior_y = 600;
+						kolizja = 0;
+					}
+
+
 					al_draw_bitmap(exit, 1100, 40, 0);
 					al_draw_bitmap(warrior, warrior_x, warrior_y, 0);
 					al_flip_display();
@@ -339,137 +355,3 @@ int main(int argc, char **argv)
 	return 0;
 }
 
-/*	if (!al_init()) {
-printf("failed to create allegro!\n");
-return -1;
-}
-ALLEGRO_DISPLAY *display = NULL;
-ALLEGRO_EVENT_QUEUE *event_queue = NULL;
-ALLEGRO_TIMER *timer = NULL;
-float warrior_x = SCREEN_W / 10.0 - WARRIOR_SIZE / 2.0;
-float warrior_y = 650 - WARRIOR_SIZE / 2.0;
-bool key[4] = { false, false, false, false };
-bool redraw = true;
-bool doexit = false;
-if (!al_install_keyboard()) {
-fprintf(stderr, "failed to initialize the keyboard!\n");
-return -1;
-}
-timer = al_create_timer(0.8 / FPS);
-if (!timer) {
-fprintf(stderr, "failed to create timer!\n");
-return -1;
-}
-if (!al_init_image_addon()) {
-fprintf(stderr, "Failed to initialize al_init_image_addon!\n");
-return -1;
-}
-display = al_create_display(SCREEN_W, SCREEN_H);
-if (!display) {
-fprintf(stderr, "failed to create display!\n");
-al_destroy_timer(timer);
-return -1;
-}
-ALLEGRO_BITMAP	*warrior = al_load_bitmap("indiana.png");
-ALLEGRO_BITMAP  *background = NULL;
-warrior = al_load_bitmap("indiana.png");
-al_convert_mask_to_alpha(warrior, al_map_rgb(255, 255, 255));
-if (!warrior) {
-fprintf(stderr, "failed to create warrior!\n");
-al_destroy_display(display);
-al_destroy_timer(timer);
-return 0;
-}
-background = al_load_bitmap("mapa4.png");
-if (!background)
-{
-fprintf(stderr, "failed to load background bitmap!\n");
-return -1;
-}
-al_set_target_bitmap(warrior);
-al_set_target_bitmap(al_get_backbuffer(display));
-event_queue = al_create_event_queue();
-if (!event_queue) {
-fprintf(stderr, "failed to create event_queue!\n");
-al_destroy_bitmap(warrior);
-al_destroy_display(display);
-al_destroy_timer(timer);
-return -1;
-}
-al_register_event_source(event_queue, al_get_display_event_source(display));
-al_register_event_source(event_queue, al_get_timer_event_source(timer));
-al_register_event_source(event_queue, al_get_keyboard_event_source());
-al_draw_bitmap(background, 0, 0, 0);
-al_flip_display();
-al_start_timer(timer);
-while (!doexit)
-{
-ALLEGRO_EVENT ev;
-al_wait_for_event(event_queue, &ev);
-if (ev.type == ALLEGRO_EVENT_TIMER) {
-if (key[KEY_UP] && warrior_y >= 4.0) {
-warrior_y -= 4.0;
-}
-if (key[KEY_DOWN] && warrior_y <= SCREEN_H - WARRIOR_SIZE - 4.0) {
-warrior_y += 4.0;
-}
-if (key[KEY_LEFT] && warrior_x >= 4.0) {
-warrior_x -= 4.0;
-}
-if (key[KEY_RIGHT] && warrior_x <= SCREEN_W - WARRIOR_SIZE - 4.0) {
-warrior_x += 4.0;
-}
-redraw = true;
-}
-else if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
-break;
-}
-else if (ev.type == ALLEGRO_EVENT_KEY_DOWN) {
-switch (ev.keyboard.keycode) {
-case ALLEGRO_KEY_UP:
-key[KEY_UP] = true;
-break;
-case ALLEGRO_KEY_DOWN:
-key[KEY_DOWN] = true;
-break;
-case ALLEGRO_KEY_LEFT:
-key[KEY_LEFT] = true;
-break;
-case ALLEGRO_KEY_RIGHT:
-key[KEY_RIGHT] = true;
-break;
-}
-}
-else if (ev.type == ALLEGRO_EVENT_KEY_UP) {
-switch (ev.keyboard.keycode) {
-case ALLEGRO_KEY_UP:
-key[KEY_UP] = false;
-break;
-case ALLEGRO_KEY_DOWN:
-key[KEY_DOWN] = false;
-break;
-case ALLEGRO_KEY_LEFT:
-key[KEY_LEFT] = false;
-break;
-case ALLEGRO_KEY_RIGHT:
-key[KEY_RIGHT] = false;
-break;
-case ALLEGRO_KEY_ESCAPE:
-doexit = true;
-break;
-}
-}
-if (redraw && al_is_event_queue_empty(event_queue)) {
-redraw = false;
-al_draw_bitmap(warrior, warrior_x, warrior_y, 0);
-al_flip_display();
-al_draw_bitmap(background, 0, 0, 0);
-}
-}
-al_destroy_bitmap(warrior);
-al_destroy_bitmap(background);
-al_destroy_timer(timer);
-al_destroy_display(display);
-al_destroy_event_queue(event_queue);
-return 0;
-} */
