@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <time.h>
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_font.h>
@@ -10,18 +11,62 @@ const float FPS = 60;
 const int SCREEN_W = 1280;
 const int SCREEN_H = 720;
 const int WARRIOR_SIZE = 84;
+float przeciwnicy[12][4];
+int ile_przeciwnikow;
 enum MYKEYS {
 	KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT
 };
+
+int Collision(int b1_x, int b1_y, int b1_w, int b1_h, int b2_x, int b2_y, int b2_w, int b2_h)
+{
+	if ((b1_x > b2_x + b2_w - 1) || // is b1 on the right side of b2?
+		(b1_y > b2_y + b2_h - 1) || // is b1 under b2?
+		(b2_x > b1_x + b1_w - 1) || // is b2 on the right side of b1?
+		(b2_y > b1_y + b1_h - 1))   // is b2 under b1?
+	{
+		// no collision
+		return 0;
+	}
+
+	// collision
+	return 1;
+}
+
+void enemy_placement(int level)
+{
+	int i;
+	time_t tt;
+	int zarodek = time(&tt);
+	srand(zarodek);
+
+	if (level == 1 || level == 2 || level == 3 || level == 4 || level == 5)
+	{
+		ile_przeciwnikow = 4;
+		for (i = 0; i < ile_przeciwnikow; i++)
+		{
+			przeciwnicy[i][0] = rand() % 2;
+			przeciwnicy[i][1] = (rand() % 1200)+40;
+			przeciwnicy[i][2] = (rand() % 520)+100;
+			przeciwnicy[i][3] = rand() % 2;
+		}
+	}
+}
+
 
 int main(int argc, char **argv)
 {
 	ALLEGRO_DISPLAY *display = NULL;
 	ALLEGRO_EVENT_QUEUE *event_queue = NULL;
+	ALLEGRO_COLOR monkey = al_map_rgb(160, 82, 45);
+	ALLEGRO_COLOR tiger = al_map_rgb(218, 165, 32);
 	ALLEGRO_KEYBOARD_STATE keyState;
 	ALLEGRO_TIMER *timer = NULL;
-	float warrior_x = SCREEN_W / 10.0 - WARRIOR_SIZE / 2.0;
-	float warrior_y = 650 - WARRIOR_SIZE / 2.0;
+	float warrior_x = 30;
+	float warrior_y = 600;
+	int next_level = 0;
+	int new_enemy = 0;
+	int i;
+	int background_img = 1;
 	bool key[4] = { false, false, false, false };
 	bool redraw = true;
 	bool doexit = false;
@@ -105,7 +150,7 @@ int main(int argc, char **argv)
 			break;
 		}
 		else if (al_key_down(&keyState, ALLEGRO_KEY_1)) {
-			background = al_load_bitmap("mapa4.png");
+			background = al_load_bitmap("mapa1.png");
 			if (!background)
 			{
 				fprintf(stderr, "failed to load background bitmap!\n");
@@ -218,25 +263,61 @@ int main(int argc, char **argv)
 				al_set_target_bitmap(warrior);
 				al_set_target_bitmap(exit);
 				al_set_target_bitmap(al_get_backbuffer(display));
-				}
-				else if (warrior_y == 40) {
+				} */
+				/*if (warrior_y == 40) {
 				background = al_load_bitmap("mapa5.png");
 				al_draw_bitmap(background, 0, 0, 0);
 				al_set_target_bitmap(warrior);
 				al_set_target_bitmap(exit);
 				al_set_target_bitmap(al_get_backbuffer(display));
-				} */ //	EKSPERYMENT!
-				
-				if (redraw && al_is_event_queue_empty(event_queue)) {
+				}  */ //	EKSPERYMENT!
+				if (next_level == 1)
+				{
+					warrior_x = 30;
+					warrior_y = 600;
+					background_img += 1;
+					switch (background_img)
+					{
+					case 2:
+						new_enemy = 0;
+						background = al_load_bitmap("mapa2.png");
+						break;
+					case 3:
+						new_enemy = 0;
+						background = al_load_bitmap("mapa3.png");
+						break;
+					case 4:
+						new_enemy = 0;
+						background = al_load_bitmap("mapa4.png");
+						break;
+					case 5:
+						new_enemy = 0;
+						background = al_load_bitmap("mapa5.png");
+						break;
+					default:
+						background_img = 1;
+						new_enemy = 0;
+						background = al_load_bitmap("mapa1.png");
+						break;
+					}
+					
+				}
+				if (new_enemy == 0)
+				{
+					new_enemy = 1;
+					enemy_placement(background_img);
+				}
+				//ruch przeciwnikow tutaj
+				next_level = Collision(warrior_x + 5, warrior_y, 60, 98, 1160, 40, 50, 85);
+				if (redraw && al_is_event_queue_empty(event_queue)) 
+				{
 					redraw = false;
-
-					al_draw_filled_rectangle(500, 400, 550, 450, al_map_rgb(160, 82, 45)); //małpa
-					al_draw_filled_rectangle(650, 150, 700, 200, al_map_rgb(160, 82, 45));
-					al_draw_filled_rectangle(950, 150, 1000, 200, al_map_rgb(160, 82, 45));
-					al_draw_filled_rectangle(350, 600, 400, 650, al_map_rgb(160, 82, 45));
-					al_draw_filled_rectangle(100, 400, 150, 450, al_map_rgb(218, 165, 32)); //tygrys
-					al_draw_filled_rectangle(100, 100, 150, 150, al_map_rgb(218, 165, 32));
-					al_draw_filled_rectangle(800, 250, 850, 300, al_map_rgb(218, 165, 32));
+					for (i = 0; i < ile_przeciwnikow; i++)
+					{
+						printf("%i :: x: %.2f :: y: %.2f\n", i,przeciwnicy[i][1], przeciwnicy[i][2]);
+						if (przeciwnicy[i][3] == 0) al_draw_filled_rectangle(przeciwnicy[i][1],przeciwnicy[i][2], przeciwnicy[i][1]+50, przeciwnicy[i][2]+50, al_map_rgb(160, 82, 45));
+						else al_draw_filled_rectangle(przeciwnicy[i][1], przeciwnicy[i][2], przeciwnicy[i][1] + 50, przeciwnicy[i][2] + 50, al_map_rgb(218, 165, 32));
+					}					
 					al_draw_bitmap(exit, 1100, 40, 0);
 					al_draw_bitmap(warrior, warrior_x, warrior_y, 0);
 					al_flip_display();
