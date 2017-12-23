@@ -407,7 +407,7 @@ int main(int argc, char **argv)
 						al_draw_filled_rectangle(przeszkody[j][1], przeszkody[j][2], przeszkody[j][1] + 20, przeszkody[j][2] + 20, al_map_rgb(0, 0, 0));
 						if (kolizja != 1)
 						{
-							kolizja = Collision(warrior_x - 6, warrior_y, 60, 98, przeszkody[j][1], przeszkody[j][2], 50, 50);
+							kolizja = Collision(warrior_x - 16, warrior_y, 40, 85, przeszkody[j][1] - 34, przeszkody[j][2], 25, 15);
 						}
 					} 
 					if (kolizja == 1)
