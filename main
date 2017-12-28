@@ -13,8 +13,10 @@ const int SCREEN_H = 720;
 const int WARRIOR_SIZE = 84;
 float przeciwnicy[12][4];
 float przeszkody[6][2];
+float krysztaly[5][2];
 int ile_przeciwnikow;
 int ile_dziur;
+int ile_krysztalow;
 float level_movement;
 
 
@@ -121,6 +123,44 @@ void hole_placement(int level)
 		przeszkody[j][2] = (rand() % 520) + 100;
 	}
 }
+void gem_placement(int level)
+{
+	int k;
+	time_t tt;
+	int zarodek = time(&tt);
+	srand(zarodek);
+
+	if (level == 1)
+	{
+		ile_krysztalow = 1;
+
+	}
+	else if (level == 2)
+	{
+		ile_krysztalow = 2;
+
+	}
+	else if (level == 3)
+	{
+		ile_krysztalow = 3;
+
+	}
+	else if (level == 4)
+	{
+		ile_krysztalow = 4;
+
+	}
+	else if (level == 6)
+	{
+		ile_krysztalow = 5;
+
+	}
+	for (k = 0; k < ile_krysztalow; k++)
+	{
+		krysztaly[k][1] = (rand() % 1200) + 40;
+		krysztaly[k][2] = (rand() % 500) + 100;
+	}
+}
 
 void enemy_movement()
 {
@@ -153,9 +193,12 @@ int main(int argc, char **argv)
 	int next_level = 0;
 	int new_enemy = 0;
 	int new_hole = 0;
+	int new_gem = 0;
 	int i;
 	int j;
+	int k;
 	int kolizja = 0;
+	int kolizjakrysztal = 0;
 	int punkty = 0;
 	
 	
@@ -189,18 +232,10 @@ int main(int argc, char **argv)
 		fprintf(stderr, "failed to create displaystart!\n");
 		return -1;
 	}
-	ALLEGRO_BITMAP	*warrior = al_load_bitmap("indiana.png");
+	ALLEGRO_BITMAP	*warrior = NULL;
 	ALLEGRO_BITMAP  *background = NULL;
 	ALLEGRO_BITMAP  *exit = NULL;
-	warrior = al_load_bitmap("indiana.png");
-	al_convert_mask_to_alpha(warrior, al_map_rgb(255, 255, 255));
-	if (!warrior) {
-		fprintf(stderr, "failed to create warrior!\n");
-		al_destroy_display(display);
-		al_destroy_timer(timer);
-		return 0;
-	}
-
+	ALLEGRO_BITMAP *gem = NULL;
 	ALLEGRO_FONT *font = al_load_ttf_font("Artesana.ttf", 64, 0);
 	ALLEGRO_FONT *fonttytul = al_load_ttf_font("ARRIBAAR.TTF", 100, 0);
 
@@ -250,6 +285,14 @@ int main(int argc, char **argv)
 				fprintf(stderr, "failed to load background bitmap!\n");
 				return -1;
 			}
+			warrior = al_load_bitmap("indiana.png");
+			al_convert_mask_to_alpha(warrior, al_map_rgb(255, 255, 255));
+			if (!warrior) {
+				fprintf(stderr, "failed to create warrior!\n");
+				al_destroy_display(display);
+				al_destroy_timer(timer);
+				return 0;
+			}
 			exit = al_load_bitmap("exit.png");
 			al_convert_mask_to_alpha(exit, al_map_rgb(255, 255, 255));
 			if (!exit) {
@@ -258,6 +301,15 @@ int main(int argc, char **argv)
 				al_destroy_timer(timer);
 				return 0;
 			}
+			gem = al_load_bitmap("gem.png");
+			al_convert_mask_to_alpha(gem, al_map_rgb(255, 255, 255));
+			if (!gem) {
+				fprintf(stderr, "failed to create gem!\n");
+				al_destroy_display(display);
+				al_destroy_timer(timer);
+				return 0;
+			}
+			
 			al_draw_bitmap(background, 0, 0, 0);
 			al_set_target_bitmap(warrior);
 			al_set_target_bitmap(exit);
@@ -365,38 +417,45 @@ int main(int argc, char **argv)
 					case 2:
 						new_hole = 0;
 						new_enemy = 0;
+						new_gem = 0;
 						background = al_load_bitmap("mapa2.png");
 						break;
 					case 3:
 						new_hole = 0;
 						new_enemy = 0;
+						new_gem = 0;
 						background = al_load_bitmap("mapa3.png");
 						break;
 					case 4:
 						new_hole = 0;
 						new_enemy = 0;
+						new_gem = 0;
 						background = al_load_bitmap("mapa4.png");
 						break;
 					case 5:
 						new_hole = 0;
 						new_enemy = 0;
+						new_gem = 0;
 						background = al_load_bitmap("mapa5.png");
 						break;
 					default:
 						background_img = 1;
 						new_enemy = 0;
 						new_hole = 0;
+						new_gem = 0;
 						background = al_load_bitmap("mapa1.png");
 						break;
 					}
 
 				}
-				if (new_enemy == 0 && new_hole == 0)
+				if (new_enemy == 0 && new_hole == 0 && new_gem == 0)
 				{
 					new_enemy = 1;
 					new_hole = 1;
+					new_gem = 1;
 					enemy_placement(background_img);
 					hole_placement(background_img);
+					gem_placement(background_img);
 				}
 				enemy_movement();
 				next_level = Collision(warrior_x + 5, warrior_y, 60, 98, 1160, 40, 50, 85);
@@ -406,7 +465,7 @@ int main(int argc, char **argv)
 					redraw = false;
 					for (i = 0; i < ile_przeciwnikow; i++)
 					{
-						
+
 						if (przeciwnicy[i][3] == 0) al_draw_filled_rectangle(przeciwnicy[i][1], przeciwnicy[i][2], przeciwnicy[i][1] + 50, przeciwnicy[i][2] + 50, al_map_rgb(160, 82, 45));
 						else al_draw_filled_rectangle(przeciwnicy[i][1], przeciwnicy[i][2], przeciwnicy[i][1] + 50, przeciwnicy[i][2] + 50, al_map_rgb(218, 165, 32));
 						if (kolizja != 1)
@@ -429,11 +488,32 @@ int main(int argc, char **argv)
 						kolizja = 0;
 						punkty = punkty - 50;
 						printf("%d\n", punkty);
-					
+
+
+					}
+					for (k = 0; k < ile_krysztalow; k++)
+					{
+						al_draw_bitmap(gem, krysztaly[k][1], krysztaly[k][2], 0);
+						if (kolizjakrysztal != 1)
+						{
+							kolizjakrysztal = Collision(warrior_x - 16, warrior_y, 40, 85, krysztaly[k][1] - 34, krysztaly[k][2], 25, 15);
+							ile_krysztalow = ile_krysztalow;
+						}
+					}
+					if (kolizjakrysztal == 1)
+					{
 						
+						ile_krysztalow = ile_krysztalow - 1;
+						kolizjakrysztal = 0;
+						punkty = punkty + 50;
+						printf("%d\n", punkty);
+
+
 					}
 					
-
+					
+					
+					
 					al_draw_bitmap(exit, 1100, 40, 0);
 					al_draw_bitmap(warrior, warrior_x, warrior_y, 0);
 					al_flip_display();
