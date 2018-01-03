@@ -438,6 +438,14 @@ int main(int argc, char **argv)
 						new_gem = 0;
 						background = al_load_bitmap("mapa5.png");
 						break;
+					case 6:
+						al_clear_to_color(al_map_rgb(2, 147, 0));
+						al_draw_text(fonttytul, al_map_rgb(223, 234, 18), SCREEN_W / 2, SCREEN_H / 2, ALLEGRO_ALIGN_CENTRE, "Gratuluje!");
+						al_draw_text(fonttytul, al_map_rgb(223, 234, 18), SCREEN_W / 2, SCREEN_H / 4, ALLEGRO_ALIGN_CENTRE, "Udalo Ci sie wydostac z dzungli!");
+						al_flip_display();
+						al_rest(5.0);
+						return 0;
+						break;
 					default:
 						background_img = 1;
 						new_enemy = 0;
