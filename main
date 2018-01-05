@@ -50,36 +50,36 @@ void enemy_placement(int level)
 	if (level == 1)
 	{
 		ile_przeciwnikow = 4;
-		level_movement = 2.0;
+		level_movement = 1.5;
 
 	}
 	else if (level == 2)
 	{
 		ile_przeciwnikow = 6;
-		level_movement = 3.0;
+		level_movement = 2.0;
 
 	}
 	else if (level == 3)
 	{
 		ile_przeciwnikow = 8;
-		level_movement = 4.0;
+		level_movement = 2.0;
 	}
 	else if (level == 4)
 	{
 		ile_przeciwnikow = 10;
-		level_movement = 5.0;
+		level_movement = 3.0;
 
 	}
 	else if (level == 5)
 	{
 		ile_przeciwnikow = 12;
-		level_movement = 6.0;
+		level_movement = 4.0;
 
 	}
 	for (i = 0; i < ile_przeciwnikow; i++)
 	{
 		przeciwnicy[i][0] = rand() % 2;
-		przeciwnicy[i][1] = (rand() % 1200) + 40;
+		przeciwnicy[i][1] = (rand() % 1190) + 40;
 		przeciwnicy[i][2] = (rand() % 610) + 42;
 		przeciwnicy[i][3] = rand() % 2;
 	}
@@ -168,7 +168,7 @@ void enemy_movement()
 	for (i = 0; i<ile_przeciwnikow; i++)
 		if (przeciwnicy[i][0] == 0)
 		{
-			przeciwnicy[i][1] -= level_movement;
+			przeciwnicy[i][1] -= level_movement; 
 			if (przeciwnicy[i][1] <= 0) przeciwnicy[i][0] = 1;
 		}
 		else
@@ -200,13 +200,13 @@ int main(int argc, char **argv)
 	int kolizja = 0;
 	int kolizjakrysztal = 0;
 	int punkty = 0;
-	
-	
+
+
 	int background_img = 1;
 	bool key[4] = { false, false, false, false };
 	bool redraw = true;
 	bool doexit = false;
-	
+
 
 
 	if (!al_init()) {
@@ -238,6 +238,8 @@ int main(int argc, char **argv)
 	ALLEGRO_BITMAP *gem = NULL;
 	ALLEGRO_FONT *font = al_load_ttf_font("Artesana.ttf", 64, 0);
 	ALLEGRO_FONT *fonttytul = al_load_ttf_font("ARRIBAAR.TTF", 100, 0);
+	ALLEGRO_FONT *fontpunkty = al_load_ttf_font("04B_03__.TTF", 15, 0);
+	ALLEGRO_FONT *fontpunktykoniec = al_load_ttf_font("04B_03__.TTF", 55, 0);
 
 	if (!font) {
 		fprintf(stderr, "Could not load 'Artesana.ttf'.\n");
@@ -309,7 +311,7 @@ int main(int argc, char **argv)
 				al_destroy_timer(timer);
 				return 0;
 			}
-			
+
 			al_draw_bitmap(background, 0, 0, 0);
 			al_set_target_bitmap(warrior);
 			al_set_target_bitmap(exit);
@@ -335,7 +337,7 @@ int main(int argc, char **argv)
 			al_flip_display();
 
 			al_start_timer(timer);
-			
+
 			while (!doexit)
 			{
 				ALLEGRO_EVENT ev1;
@@ -440,8 +442,9 @@ int main(int argc, char **argv)
 						break;
 					case 6:
 						al_clear_to_color(al_map_rgb(2, 147, 0));
-						al_draw_text(fonttytul, al_map_rgb(223, 234, 18), SCREEN_W / 2, SCREEN_H / 2, ALLEGRO_ALIGN_CENTRE, "Gratuluje!");
-						al_draw_text(fonttytul, al_map_rgb(223, 234, 18), SCREEN_W / 2, SCREEN_H / 4, ALLEGRO_ALIGN_CENTRE, "Udalo Ci sie wydostac z dzungli!");
+						al_draw_text(fontpunktykoniec, al_map_rgb(223, 234, 18), SCREEN_W / 2, 100, ALLEGRO_ALIGN_CENTRE, "Gratuluje!");
+						al_draw_text(fontpunktykoniec, al_map_rgb(223, 234, 18), SCREEN_W / 2, 300, ALLEGRO_ALIGN_CENTRE, "Udalo Ci sie wydostac z dzungli");
+						al_draw_textf(fontpunktykoniec, al_map_rgb(223, 234, 18), SCREEN_W / 2, 500, ALLEGRO_ALIGN_CENTRE, "Ilosc uzyskanych punktow: %d", punkty);
 						al_flip_display();
 						al_rest(5.0);
 						return 0;
@@ -467,7 +470,7 @@ int main(int argc, char **argv)
 				}
 				enemy_movement();
 				next_level = Collision(warrior_x + 5, warrior_y, 60, 98, 1160, 40, 50, 85);
-				
+
 				if (redraw && al_is_event_queue_empty(event_queue))
 				{
 					redraw = false;
@@ -478,7 +481,7 @@ int main(int argc, char **argv)
 						else al_draw_filled_rectangle(przeciwnicy[i][1], przeciwnicy[i][2], przeciwnicy[i][1] + 50, przeciwnicy[i][2] + 50, al_map_rgb(218, 165, 32));
 						if (kolizja != 1)
 						{
-							kolizja = Collision(warrior_x - 6, warrior_y, 60, 98, przeciwnicy[i][1], przeciwnicy[i][2], 50, 50);
+							kolizja = Collision(warrior_x, warrior_y, 50, 98, przeciwnicy[i][1] - 11, przeciwnicy[i][2] + 4, 40, 40);
 						}
 					}
 					for (j = 0; j < ile_dziur; j++)
@@ -486,7 +489,7 @@ int main(int argc, char **argv)
 						al_draw_filled_rectangle(przeszkody[j][1], przeszkody[j][2], przeszkody[j][1] + 20, przeszkody[j][2] + 20, al_map_rgb(0, 0, 0));
 						if (kolizja != 1)
 						{
-							kolizja = Collision(warrior_x - 16, warrior_y, 40, 85, przeszkody[j][1] - 34, przeszkody[j][2], 25, 15);
+							kolizja = Collision(warrior_x - 42, warrior_y, 40, 85, przeszkody[j][1] - 50, przeszkody[j][2], 15, 15);
 						}
 					}
 					if (kolizja == 1)
@@ -505,12 +508,12 @@ int main(int argc, char **argv)
 						if (kolizjakrysztal != 1)
 						{
 							kolizjakrysztal = Collision(warrior_x - 16, warrior_y, 40, 85, krysztaly[k][1] - 34, krysztaly[k][2], 25, 15);
-							ile_krysztalow = ile_krysztalow;
+							
 						}
 					}
 					if (kolizjakrysztal == 1)
 					{
-						
+
 						ile_krysztalow = ile_krysztalow - 1;
 						kolizjakrysztal = 0;
 						punkty = punkty + 50;
@@ -518,20 +521,21 @@ int main(int argc, char **argv)
 
 
 					}
-					
-					
-					
-					
+
+
+
+
 					al_draw_bitmap(exit, 1100, 40, 0);
 					al_draw_bitmap(warrior, warrior_x, warrior_y, 0);
 					al_flip_display();
 					al_draw_bitmap(background, 0, 0, 0);
+					al_draw_textf(fontpunkty, al_map_rgb(223, 234, 18), 20, 30, ALLEGRO_ALIGN_LEFT, "Punkty: %d", punkty);
 
 				}
-				
-}
 
-			
+			}
+
+
 
 		}
 	}
