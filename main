@@ -13,7 +13,7 @@ const int SCREEN_H = 720;
 const int WARRIOR_SIZE = 84;
 float przeciwnicy[12][4];
 float przeszkody[6][2];
-float krysztaly[5][2];
+float krysztaly[5][3];
 int ile_przeciwnikow;
 int ile_dziur;
 int ile_krysztalow;
@@ -125,9 +125,11 @@ void hole_placement(int level)
 }
 void gem_placement(int level)
 {
-	int k;
+	int k,i;
 	time_t tt;
 	int zarodek = time(&tt);
+	bool konflikt = false;
+
 	srand(zarodek);
 
 	if (level == 1)
@@ -157,8 +159,25 @@ void gem_placement(int level)
 	}
 	for (k = 0; k < ile_krysztalow; k++)
 	{
+		krysztaly[k][0] = 1;
 		krysztaly[k][1] = (rand() % 1200) + 40;
 		krysztaly[k][2] = (rand() % 500) + 100;
+		for (i = 0; i < ile_dziur; i++)
+		{
+			do
+			{
+				if (Collision(krysztaly[k][1], krysztaly[k][2], 25, 15, przeszkody[i][1] - 20, przeszkody[i][2] - 20, 55, 55) == 1)
+				{
+					konflikt = false;
+					krysztaly[k][1] = (rand() % 1200) + 40;
+					krysztaly[k][2] = (rand() % 500) + 100;
+				}
+				else konflikt = true;
+
+				if (konflikt) break;
+			} while (1);
+		 }
+
 	}
 }
 
@@ -168,7 +187,7 @@ void enemy_movement()
 	for (i = 0; i<ile_przeciwnikow; i++)
 		if (przeciwnicy[i][0] == 0)
 		{
-			przeciwnicy[i][1] -= level_movement; 
+			przeciwnicy[i][1] -= level_movement;
 			if (przeciwnicy[i][1] <= 0) przeciwnicy[i][0] = 1;
 		}
 		else
@@ -504,27 +523,16 @@ int main(int argc, char **argv)
 					}
 					for (k = 0; k < ile_krysztalow; k++)
 					{
-						al_draw_bitmap(gem, krysztaly[k][1], krysztaly[k][2], 0);
-						if (kolizjakrysztal != 1)
+						if(krysztaly[k][0] == 1)al_draw_bitmap(gem, krysztaly[k][1], krysztaly[k][2], 0);
+						
+							if(Collision(warrior_x - 16, warrior_y, 40, 85, krysztaly[k][1] - 34, krysztaly[k][2], 25, 15) == 1 && krysztaly[k][0] == 1)
+
+						
 						{
-							kolizjakrysztal = Collision(warrior_x - 16, warrior_y, 40, 85, krysztaly[k][1] - 34, krysztaly[k][2], 25, 15);
-							
+							krysztaly[k][0] = 0;
+							punkty += 50;
 						}
 					}
-					if (kolizjakrysztal == 1)
-					{
-
-						ile_krysztalow = ile_krysztalow - 1;
-						kolizjakrysztal = 0;
-						punkty = punkty + 50;
-						printf("%d\n", punkty);
-
-
-					}
-
-
-
-
 					al_draw_bitmap(exit, 1100, 40, 0);
 					al_draw_bitmap(warrior, warrior_x, warrior_y, 0);
 					al_flip_display();
